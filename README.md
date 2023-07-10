@@ -1,4 +1,6 @@
-# CfgFunctions.hpp Generator README
+![Logo](https://github.com/Ezcoo/CfgFunctionsGenerator-Arma3/blob/fa3a947a0da19487e8eb42306fe34ca2b19aaa85/logo/icon.png)
+
+# CfgFunctions.hpp Generator (Arma 3)
 
 This Visual Studio Code extension creates CfgFunctions.hpp file with a simple click of a button when developing Arma 3.
 
