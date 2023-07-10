@@ -1,0 +1,74 @@
+{
+  "name": "cfgfunctionsgeneratorarma3",
+  "displayName": "CfgFunctions Generator (Arma 3)",
+  "description": "Adds an editor button for automatic (re)generation of CfgFunctions.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.79.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cfgfunctions.generateCfgFunctions",
+        "title": "Generate CfgFunctions (Arma 3)",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "cfgfunctions.generateCfgFunctions",
+          "group": "navigation",
+          "when": "resourceFilename == CfgFunctions.hpp",
+          "icon": "$(refresh)"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "CfgFunctions Generator (Arma 3) Settings",
+      "properties": {
+        "cfgfunctionsTag": {
+          "type": "string",
+          "default": "YOUR_TAG_HERE",
+          "description": "Specifies your personal tag to prevent duplicate functions, e.g. in projects with dependencies."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/find-parent-dir": "^0.3.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.4.1",
+    "@types/vscode": "^1.79.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-electron": "^2.3.2",
+    "eslint": "^8.41.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "fast-glob": "^3.2.12",
+    "file-uri-to-path": "^2.0.0",
+    "find-parent-dir": "^0.3.1",
+    "find-up": "^6.3.0"
+  }
+}
