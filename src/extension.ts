@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
 			"\t{\n" +
 			"\n";
 
-		const currentFileString = vscode.window.activeTextEditor?.document.uri.fsPath.toString();
+		const currentFileString = vscode.window.activeTextEditor?.document.uri.fsPath.toString() ?? "";
 
 		const currentDirString = path.dirname(currentFileString);
 		const currentDirUri = vscode.Uri.file(currentDirString);
@@ -156,7 +156,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 		const depth = functionDirPathSplit.length;
 
 		let sqfFileStringSplit = sqfFileString.split(path.sep);
-		let sqfFilename = sqfFileStringSplit.at(-1);
+		let sqfFilename = sqfFileStringSplit?.at(-1) ?? "";
 
 		if (sqfFilename === undefined) {
 			vscode.window.showErrorMessage("Generic error!");
