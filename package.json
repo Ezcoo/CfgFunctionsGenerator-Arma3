@@ -2,6 +2,7 @@
   "name": "cfgfunctionsgeneratorarma3",
   "displayName": "CfgFunctions Generator (Arma 3)",
   "description": "Adds an editor button for automatic (re)generation of CfgFunctions.",
+  "icon": "logo/logo.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.79.0"
