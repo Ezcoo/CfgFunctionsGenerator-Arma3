@@ -1,4 +1,4 @@
-![Logo](https://github.com/Ezcoo/CfgFunctionsGenerator-Arma3/blob/fa3a947a0da19487e8eb42306fe34ca2b19aaa85/logo/icon.png)
+![Logo](https://github.com/Ezcoo/CfgFunctionsGenerator-Arma3/blob/645e11a932bf8aa233dec496b902c96914d95833/logo/icon_small.png)
 
 # CfgFunctions.hpp Generator (Arma 3)
 
