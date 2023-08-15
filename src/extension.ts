@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fastglob from 'fast-glob';
 import uripath from 'file-uri-to-path';
 import path from 'path';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -129,6 +129,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposableCfgFunctionsGenerator);
+
+	loadCfgFunctionsCompletion(context);
 }
 
 // This method is called when your extension is deactivated
@@ -214,3 +216,51 @@ function coreFunctionName(functionName: string, functionDirPath: string) {
 	return "class " + functionName + " { file = \"" + functionDirPath + "\"; };";
 }
 
+function loadCfgFunctionsCompletion(context: vscode.ExtensionContext) {
+	const cfgFunctionsPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+	if (cfgFunctionsPath === undefined) {
+		return;
+	}
+
+	const cfgFunctionsFile = readFileSync(cfgFunctionsPath, 'utf-8');
+	
+	const cfgFunctionsLines = cfgFunctionsFile.split(/\r?\n/);
+
+	let cfgFunctionsLinesFiltered = [];
+
+	const cfgFunctionsLinesIterator = cfgFunctionsLines.values();
+
+	for (const line of cfgFunctionsLinesIterator) {
+		if (line.toString().includes(".sqf")) {
+			cfgFunctionsLinesFiltered.push(line);
+		}
+	}
+
+	let cfgFunctionsFncsFormatted = [];
+
+	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
+
+	const developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+
+	for (const line of cfgFunctionsFncsIterator) {
+		const lineStr = line.toString();
+		const functionName = developerTag + "_fnc_" + (lineStr.substring(lineStr.indexOf("class ") + 6, (lineStr.indexOf(" { file = "))));
+		cfgFunctionsFncsFormatted.push(functionName);
+	}
+
+	const cfgFunctionsFncsFormattedIterator = cfgFunctionsFncsFormatted.values();
+
+	for (const fnc of cfgFunctionsFncsFormattedIterator) {
+		const disposable = vscode.languages.registerCompletionItemProvider('sqf', {
+			provideCompletionItems(document: vscode.TextDocument, Position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
+				let cmpItems = [];
+					// kind/type: 13 = KEYWORD - see index.d.ts:4413
+					let cmpItem = new vscode.CompletionItem(fnc, 13);
+					cmpItems.push(cmpItem);
+				return cmpItems;
+			}
+		});
+		context.subscriptions.push(disposable);
+	}
+}
