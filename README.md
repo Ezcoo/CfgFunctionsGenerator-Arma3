@@ -4,10 +4,11 @@ This Visual Studio Code extension creates `CfgFunctions.hpp` file with a simple 
 
 ## Features
 
-* Automatic generation of `CfgFunctions.hpp` file with a simple button click in VS Code interface (CfgFunctions.hpp file needs to be open and active)
+* Automatic generation of `CfgFunctions.hpp` file with a simple button click in VS Code interface (`CfgFunctions.hpp` file needs to be open and active)
 * Support for even complex projects with multiple dependencies or otherwise complex/large folder structure
 * Personal/project tag included in settings (mandatory)
 * Autocompletion for functions in the Functions Library that have been defined/added by the user (since v0.2.0) - note that you need to auto-generate `CfgFunctions.hpp` once after opening the editor for the autocompletion to become active
+* Generation of `CfgRemoteExec.hpp` template based on your custom functions by running a task (`Ctrl` + `Shift` + `P`) (since v0.3.0)
 
 ## Requirements
 
@@ -24,8 +25,9 @@ This Visual Studio Code extension creates `CfgFunctions.hpp` file with a simple 
 ## Known Issues
 
 * You must click the `CfgFunctions.hpp` file contents in editor view at first before clicking the "Generate CfgFunctions.hpp (Arma 3)" button.
-* `CfgFunctions.hpp` generation might fail if CfgFunctions.hpp file has been edited and not saved when clicking the generate button.
+* `CfgFunctions.hpp` generation might fail if `CfgFunctions.hpp` file has been edited and not saved when clicking the generate button.
 * Autocompletion of custom user defined functions works only after running the automatic generation of `CfgFunctions.hpp` at least once after opening the editor.
+* If you generate `CfgRemoteExec.hpp`, 1. the file must not exist yet (the operation will fail if the file exists already to prevent accidental overwrites), 2. you need to have generated `CfgFunctions.hpp` at least once, and 3. have the `CfgFunctions.hpp` file active in the editor (by e.g. clicking on it's contents in the normal editor view) when you run the `Generate CfgRemoteExec template (Arma 3)` task. (`Ctrl` + `Shift` + `P`)
 
 It's WIP. Expect issues. Bug reports are highly appreciated!
 
@@ -38,6 +40,11 @@ Initial release.
 ### 0.2.0
 
 Added autocompletion for functions in the Functions Library defined by the user.
+
+## 0.3.0
+
+- Added an option/task to generate `CfgRemoteExec.hpp` template based on the `CfgFunctions.hpp`
+  - Note that you must generate the `CfgFunctions.hpp` at least once and make sure that the file is active by clicking on it in the editor view before you can run the `Generate CfgRemoteExec template (Arma 3)` task. (`Ctrl` + `Shift` + `P`)
 
 ---
 
