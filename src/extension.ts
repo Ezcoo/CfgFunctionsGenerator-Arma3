@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fastglob from 'fast-glob';
 import uripath from 'file-uri-to-path';
-import path from 'path';
+import path, { sep } from 'path';
 import fs, { readFileSync } from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -130,11 +130,24 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposableCfgFunctionsGenerator);
 
-	loadCfgFunctionsCompletion(context);
+	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context);
+
+	if (cfgFunctionsFncNames === undefined) {
+		return;
+	}
+
+	let disposableCfgRemoteExecGenerator = vscode.commands.registerCommand('cfgfunctions.generateCfgRemoteExec', async () => { 
+		
+		generateCfgRemoteExec(context);
+
+	});
+
+	context.subscriptions.push(disposableCfgRemoteExecGenerator);
+
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate(): void {}
 
 function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel) {
 	let functionName = "";
@@ -263,4 +276,111 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext) {
 		});
 		context.subscriptions.push(disposable);
 	}
+
+	return cfgFunctionsFncsFormatted;
+}
+
+function generateCfgRemoteExec(context: vscode.ExtensionContext) {
+	let content =
+			"\n" +
+			"class CfgRemoteExec\n" +
+			"{\n" +
+			"\n" +
+			"\tclass " + "Functions" + "\n" +
+			"\t{\n" +
+			"\n" +
+			"\t\t" + "// Only whitelisted functions are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n" +
+			"\t\t" + "mode = 1;" + 
+			"\n" +
+			"\t\t" + "// JIP flag can not be set by default (unless overriden by function or command declaration itself). Other values: 1 = JIP flag can be set" + "\n" +
+			"\t\t" + "jip = 0;" +
+			"\n\n" +
+			"\t\t" + "// Note that 'allowedTargets' properties in the list below can target all machines by default! Changing them on a case-by-case basis is highly recommended." + "\n" +
+			"\t\t" + "// Other (and recommended) values: 1 = only clients as allowed target, 2 = only server as allowed target" +
+			"\n\n";
+
+	const cfgFunctionsPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+	const outputChannel = vscode.window.createOutputChannel("Arma 3 CfgRemoteExec generator");
+
+	outputChannel.appendLine("" + cfgFunctionsPath);
+
+	if (cfgFunctionsPath === undefined) {
+		vscode.window.showErrorMessage("Error! Make sure that you've clicked the editor area of your CfgFunctions.hpp before running the CfgRemoteExec generation task.");
+		outputChannel.appendLine("Error! Make sure that you've clicked the editor area of your CfgFunctions.hpp before running the CfgRemoteExec generation task.");
+		return;
+	}
+	
+	const cfgFunctionsFile = readFileSync(cfgFunctionsPath, 'utf-8');
+	
+	const cfgFunctionsLines = cfgFunctionsFile.split(/\r?\n/);
+	
+	let cfgFunctionsLinesFiltered = [];
+	
+	const cfgFunctionsLinesIterator = cfgFunctionsLines.values();
+	
+	for (const line of cfgFunctionsLinesIterator) {
+		if (line.toString().includes(".sqf")) {
+			cfgFunctionsLinesFiltered.push(line);
+		}
+	}
+	
+	let cfgFunctionsFncsFormatted = [];
+	
+	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
+	
+	const developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+	
+	for (const line of cfgFunctionsFncsIterator) {
+		const lineStr = line.toString();
+		const functionName = developerTag + "_fnc_" + (lineStr.substring(lineStr.indexOf("class ") + 6, (lineStr.indexOf(" { file = "))));
+		cfgFunctionsFncsFormatted.push(functionName);
+	}
+
+	const cfgFunctionsFncsFormattedIterator = cfgFunctionsFncsFormatted.values();
+
+	for (const fnc of cfgFunctionsFncsFormattedIterator) {
+		let fncRemoteExecClassString =
+			"\t\t" + "class " + fnc + "\n" +
+			"\t\t" + "{" + "\n" +
+			"\t\t\t" + "allowedTargets = 0;" + "\n" +
+			"\t\t\t" + "jip = 0;" + "\n" +
+			"\t\t};" +
+			"\n\n";
+
+		content += fncRemoteExecClassString;
+	}
+
+	content += "\t\t};"
+
+	content += "\n\n" + 
+		"class Commands" + "\n" + "\t{" + "\n" +
+		"\t\t" + "// Only whitelisted commands are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n" +
+		"\t\t" + "mode = 1;" + "\n\n" +
+		"\t\t" + "// Note that blocking raw SQF command input is recommended. You should whitelist only (precompiled) functions because of security reasons." + "\n" +
+		"\t\t" + "// See more info (and a super useful trick to increase security of your project) at the comments section of https://community.bistudio.com/wiki/remoteExec" + "\n" +
+		"\t};" + "\n\n" +
+		"};";
+
+	const workspaceEdit = new vscode.WorkspaceEdit();
+
+	const cfgFunctionsURI = vscode.window.activeTextEditor?.document.uri.fsPath.toString();
+
+	const formattedCfgFunctionsFsPathString = require("path").join(cfgFunctionsURI, "../");
+
+	let cfgRemoteExecURI = vscode.Uri.file(formattedCfgFunctionsFsPathString + "CfgRemoteExec.hpp");
+
+	if (cfgRemoteExecURI === undefined) {
+		return;
+	}
+
+	// const cfgFunctionsURIsSplit = format.split(sep);
+	// const cfgFunctionsFolderURI = cfgFunctionsURIsSplit?.slice(0, cfgFunctionsURIsSplit.length-1).join(sep);
+
+	workspaceEdit.createFile(cfgRemoteExecURI, {overwrite: false});
+
+	fs.writeFileSync(cfgRemoteExecURI.fsPath, content, {flag: "ax"});
+
+	vscode.workspace.applyEdit(workspaceEdit);
+
 }
