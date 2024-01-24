@@ -47,6 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
 			"\n";
 
 		const currentFileString = vscode.window.activeTextEditor?.document.uri.fsPath.toString() ?? "";
+		context.workspaceState.update('cfgFunctionsPathInProject', currentFileString);
 
 		const currentDirString = path.dirname(currentFileString);
 		const currentDirUri = vscode.Uri.file(currentDirString);
@@ -130,9 +131,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposableCfgFunctionsGenerator);
 
-	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context);
+	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
 
-	if (cfgFunctionsFncNames === undefined) {
+	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject);
+
+	if (cfgFunctionsFncNames === undefined || cfgFunctionsPathInProject === '') {
 		return;
 	}
 
@@ -146,7 +149,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 }
 
-// This method is called when your extension is deactivated
 export function deactivate(): void {}
 
 function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel) {
@@ -229,8 +231,7 @@ function coreFunctionName(functionName: string, functionDirPath: string) {
 	return "class " + functionName + " { file = \"" + functionDirPath + "\"; };";
 }
 
-function loadCfgFunctionsCompletion(context: vscode.ExtensionContext) {
-	const cfgFunctionsPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctionsPath: string) {
 
 	if (cfgFunctionsPath === undefined) {
 		return;
@@ -250,11 +251,11 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext) {
 		}
 	}
 
-	let cfgFunctionsFncsFormatted = [];
+	let cfgFunctionsFncsFormatted:string[] = [];
 
 	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
 
-	const developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+	const developerTag:string = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? 'YOUR_TAG_HERE';
 
 	for (const line of cfgFunctionsFncsIterator) {
 		const lineStr = line.toString();
@@ -262,20 +263,27 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext) {
 		cfgFunctionsFncsFormatted.push(functionName);
 	}
 
-	const cfgFunctionsFncsFormattedIterator = cfgFunctionsFncsFormatted.values();
+	const provider = vscode.languages.registerCompletionItemProvider('sqf', {
 
-	for (const fnc of cfgFunctionsFncsFormattedIterator) {
-		const disposable = vscode.languages.registerCompletionItemProvider('sqf', {
-			provideCompletionItems(document: vscode.TextDocument, Position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
-				let cmpItems = [];
-					// kind/type: 13 = KEYWORD - see index.d.ts:4413
-					let cmpItem = new vscode.CompletionItem(fnc, 13);
-					cmpItems.push(cmpItem);
-				return cmpItems;
+		provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
+
+			const cmpItems = new Array<vscode.CompletionItem>;
+
+			for (const fnc of cfgFunctionsFncsFormatted) {
+				
+				// kind/type: 13 = KEYWORD - see index.d.ts:4413
+				const cmpItem = new vscode.CompletionItem(fnc, vscode.CompletionItemKind.Function);
+				cmpItems.push(cmpItem);
 			}
-		});
-		context.subscriptions.push(disposable);
+
+			return cmpItems;
+		}
+
 	}
+
+	);
+		
+	context.subscriptions.push(provider);
 
 	return cfgFunctionsFncsFormatted;
 }

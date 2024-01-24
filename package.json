@@ -3,7 +3,7 @@
   "displayName": "CfgFunctions Generator (Arma 3)",
   "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions for Arma 3.",
   "icon": "logo/icon.png",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "Ezcoo",
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
@@ -25,7 +25,9 @@
     "CfgFunctions.hpp"
   ],
   "activationEvents": [
-    "onLanguage:hpp"
+    "onLanguage:hpp",
+    "onLanguage:sqf",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -61,7 +63,12 @@
           "description": "Specifies your personal tag to prevent duplicate functions, e.g. in projects with dependencies."
         }
       }
-    }
+    },
+    "languages": [{
+      "id": "sqf",
+      "extensions": [".sqf"],
+      "aliases": ["SQF","sqf"]
+    }]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
