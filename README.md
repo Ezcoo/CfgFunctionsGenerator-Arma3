@@ -9,6 +9,7 @@ This Visual Studio Code extension creates `CfgFunctions.hpp` file with a simple 
 * Personal/project tag included in settings (mandatory)
 * Autocompletion for functions in the Functions Library that have been defined/added by the user (since v0.2.0) - note that you need to auto-generate `CfgFunctions.hpp` once after opening the editor for the autocompletion to become active
 * Generation of `CfgRemoteExec.hpp` template based on your custom functions by running a task (`Ctrl` + `Shift` + `P`) (since v0.3.0)
+* Support for `postInit` and `preInit` attributes. Name your function `fn_preInit_yourFunction.sqf` or `fn_postInit_yourFunction.sqf` to include the needed attribute. (Since v0.5.0)
 
 ## Requirements
 
@@ -50,6 +51,10 @@ Note that you must generate the `CfgFunctions.hpp` at least once and make sure t
 ### 0.4.0
 
 Fixed IntelliSense suggestions. The editor/IntelliSense should now suggest autocompletion of defined functions properly when you start typing the full function name (starting from your developer tag/prefix).
+
+### 0.5.0
+
+Added support for `postInit` and `preInit` attributes for functions. Name your function `fn_preInit_yourFunction.sqf` or `fn_postInit_yourFunction.sqf` to include the needed attribute.
 
 ---
 

@@ -153,6 +153,8 @@ export function deactivate(): void {}
 
 function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel) {
 	let functionName = "";
+	let preInit = false;
+	let postInit = false;
 	let functionPath = "";
 	let functionDirPath = "";
 	let subcategory = "";
@@ -192,17 +194,45 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 
 			functionName = functionName.replace("fn_", "");
 
+
+
+			if (functionName.startsWith('preInit') || functionName.startsWith('preinit') || functionName.startsWith('PreInit') || functionName.startsWith('Preinit')) {
+				preInit = true;
+
+				if (!functionName.startsWith('preInit')) {
+					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"preInit\" attribute. Please use camelCase formatting.")
+					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.")
+				}
+
+				functionName = functionName.replace("preInit", "");
+			}
+
+			if (functionName.startsWith('postInit') || functionName.startsWith('postinit') || functionName.startsWith('PostInit') || functionName.startsWith('Postinit')) {
+				postInit = true;
+
+				if (!functionName.startsWith('postInit')) {
+					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"postInit\" attribute. Please use camelCase formatting.")
+					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.")
+				}
+
+				functionName = functionName.replace("postInit", "");
+			}
+
+			if (functionName.startsWith("_")) {
+				functionName = functionName.replace("_", "");
+			}
+
 			functionPath = functionDirPath + path.sep + sqfFilename;
 
 			if (depth > 2) {
 				let functionDirPathSplitReversed = functionDirPathSplit.reverse();
 				subcategory = functionDirPathSplitReversed[depth - (depth - (depth - 3))];
 
-				returnValue = nestedFolderFunctionName(subcategory, functionName, functionPath);
+				returnValue = nestedFolderFunctionName(subcategory, functionName, functionPath, preInit, postInit);
 			}
 
 			else if (depth === 2) {
-				returnValue = coreFunctionName(functionName, functionPath);
+				returnValue = coreFunctionName(functionName, functionPath, preInit, postInit);
 
 			}
 			
@@ -223,11 +253,27 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 	return returnValue;
 }
 
-function nestedFolderFunctionName(subcategory: string, functionName: string, functionPath: string) {
-	return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; };";
+function nestedFolderFunctionName(subcategory: string, functionName: string, functionPath: string, preInit: boolean, postInit: boolean) {
+	if (preInit) {
+		return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; preInit = 1; };";
+	}
+
+	if (postInit) {
+		return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; postInit = 1; };"
+	}
+
+	return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; };"
 }
 
-function coreFunctionName(functionName: string, functionDirPath: string) {
+function coreFunctionName(functionName: string, functionDirPath: string, preInit: boolean, postInit: boolean) {
+	if (preInit) {
+		return "class " + functionName + " { file = \"" + functionDirPath + "\"; preInit = 1 };";
+	}
+
+	if (postInit) {
+		return "class " + functionName + " { file = \"" + functionDirPath + "\"; postInit = 1 };";
+	}
+	
 	return "class " + functionName + " { file = \"" + functionDirPath + "\"; };";
 }
 
@@ -254,7 +300,7 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctio
 	let cfgFunctionsFncsFormatted:string[] = [];
 
 	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
-
+ 
 	const developerTag:string = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? 'YOUR_TAG_HERE';
 
 	for (const line of cfgFunctionsFncsIterator) {
@@ -359,7 +405,7 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 		content += fncRemoteExecClassString;
 	}
 
-	content += "\t\t};"
+	content += "\t};"
 
 	content += "\n\n" + 
 		"class Commands" + "\n" + "\t{" + "\n" +

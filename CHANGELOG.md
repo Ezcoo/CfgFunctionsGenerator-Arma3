@@ -12,3 +12,11 @@
 
 - Added an option/task to generate `CfgRemoteExec.hpp` template based on the `CfgFunctions.hpp`
   - Note that you must generate the `CfgFunctions.hpp` at least once and make sure that the file is active by clicking on it in the editor view before you can run the `Generate CfgRemoteExec template (Arma 3)` task. (`Ctrl` + `Shift` + `P`)
+
+## [0.4.0]
+
+- Fixed IntelliSense suggestions. The editor/IntelliSense should now suggest autocompletion of defined functions properly when you start typing the full function name (starting from your developer tag/prefix).
+
+## [0.5.0]
+
+- Added support for `postInit` and `preInit` attributes for functions. Name your function `fn_preInit_yourFunction.sqf` or `fn_postInit_yourFunction.sqf` to include the needed attribute.
