@@ -20,3 +20,7 @@
 ## [0.5.0]
 
 - Added support for `postInit` and `preInit` attributes for functions. Name your function `fn_preInit_yourFunction.sqf` or `fn_postInit_yourFunction.sqf` to include the needed attribute.
+
+### [0.5.1]
+
+- Hotfix: missing semicolon when using attributes on core functions.

@@ -3,7 +3,7 @@
   "displayName": "CfgFunctions Generator (Arma 3)",
   "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions for Arma 3.",
   "icon": "logo/icon.png",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "Ezcoo",
   "license": "SEE LICENSE IN LICENSE",
   "engines": {

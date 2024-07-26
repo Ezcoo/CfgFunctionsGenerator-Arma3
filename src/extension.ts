@@ -267,11 +267,11 @@ function nestedFolderFunctionName(subcategory: string, functionName: string, fun
 
 function coreFunctionName(functionName: string, functionDirPath: string, preInit: boolean, postInit: boolean) {
 	if (preInit) {
-		return "class " + functionName + " { file = \"" + functionDirPath + "\"; preInit = 1 };";
+		return "class " + functionName + " { file = \"" + functionDirPath + "\"; preInit = 1; };";
 	}
 
 	if (postInit) {
-		return "class " + functionName + " { file = \"" + functionDirPath + "\"; postInit = 1 };";
+		return "class " + functionName + " { file = \"" + functionDirPath + "\"; postInit = 1; };";
 	}
 	
 	return "class " + functionName + " { file = \"" + functionDirPath + "\"; };";
