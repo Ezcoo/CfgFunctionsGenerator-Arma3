@@ -24,3 +24,6 @@
 ### [0.5.1]
 
 - Hotfix: missing semicolon when using attributes on core functions.
+
+## [1.0.0]
+- Support for persistent remote execution framework (`CfgRemoteExec.hpp`) parameters (function targets and JIP (Join In Progress)) for added security.
