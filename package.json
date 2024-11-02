@@ -1,9 +1,9 @@
 {
   "name": "cfgfunctionsgeneratorarma3",
-  "displayName": "CfgFunctions Generator (Arma 3)",
-  "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions for Arma 3.",
+  "displayName": "CfgFunctions & CfgRemoteExec Generator (Arma 3)",
+  "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions and CfgRemoteExec for Arma 3.",
   "icon": "logo/icon.png",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "publisher": "Ezcoo",
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
@@ -22,7 +22,11 @@
     "Arma3",
     "SQF",
     "CfgFunctions",
-    "CfgFunctions.hpp"
+    "CfgFunctions.hpp",
+    "CfgRemoteExec",
+    "CfgRemoteExec.hpp",
+    "Remote Execution",
+    "Remote Exec"
   ],
   "activationEvents": [
     "onLanguage:hpp",
