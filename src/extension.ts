@@ -192,9 +192,11 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 				sqfFileStringTemp = sqfFileStringTemp.substring(1);
 			}
 
-			functionName = functionName.replace("fn_", "");
+			functionName = functionName.replace("fn", "");
 
-
+			while (functionName.startsWith("_")) {
+				functionName = functionName.replace("_", "");
+			}
 
 			if (functionName.toLowerCase().startsWith('preinit')) {
 				preInit = true;
@@ -218,7 +220,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 				functionName = functionName.replace("postInit", "");
 			}
 
-			if (functionName.startsWith("_")) {
+			while (functionName.startsWith("_")) {
 				functionName = functionName.replace("_", "");
 			}
 
