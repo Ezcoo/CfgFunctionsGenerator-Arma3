@@ -6,11 +6,11 @@ This Visual Studio Code extension creates `CfgFunctions.hpp` file with a simple 
 
 
 ### CfgFunctions generation
-<img src="https://github.com/Ezcoo/CfgFunctionsGenerator-Arma3/blob/main/gif/cfgFunctions.gif" width="100%" height="100%">
+<img src="https://raw.githubusercontent.com/Ezcoo/CfgFunctionsGenerator-Arma3/refs/heads/main/gif/cfgFunctions.gif" width="100%" height="100%">
 
 
 ### CfgRemoteExec generation
-<img src="https://github.com/Ezcoo/CfgFunctionsGenerator-Arma3/blob/main/gif/cfgRemoteExec.gif" width="100%" height="100%">
+<img src="https://raw.githubusercontent.com/Ezcoo/CfgFunctionsGenerator-Arma3/refs/heads/main/gif/cfgRemoteExec.gif" width="100%" height="100%">
 
 
 ## Features
