@@ -196,7 +196,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 
 
 
-			if (functionName.startsWith('preInit') || functionName.startsWith('preinit') || functionName.startsWith('PreInit') || functionName.startsWith('Preinit')) {
+			if (functionName.toLowerCase().startsWith('preinit')) {
 				preInit = true;
 
 				if (!functionName.startsWith('preInit')) {
@@ -207,7 +207,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 				functionName = functionName.replace("preInit", "");
 			}
 
-			if (functionName.startsWith('postInit') || functionName.startsWith('postinit') || functionName.startsWith('PostInit') || functionName.startsWith('Postinit')) {
+			if (functionName.toLowerCase().startsWith('postinit')) {
 				postInit = true;
 
 				if (!functionName.startsWith('postInit')) {
