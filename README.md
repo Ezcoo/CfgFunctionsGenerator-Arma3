@@ -31,6 +31,7 @@ This Visual Studio Code extension creates `CfgFunctions.hpp` file with a simple 
 * SQF files must be located in _subfolder_ of `MISSION_OR_CAMPAIGN_ROOT/functions/` folder
 * `CfgFunctions.hpp` file needs to be open and the active file in the editor
 * To generate `CfgRemoteExec.hpp`, you need to have `CfgFunctions.hpp` open and as active file in the editor
+* For persistent CfgRemoteExec parameters, use formatting `fn_%1_%2_functionName.sqf` where `%1 = ALL | CLIENT | SERVER` and `%2 = JIP`. Or the former in reverse order, it's supported too. Example: `fn_CLIENT_JIP_getCarKeys.sqf` or `fn_JIP_CLIENT_getCarKeys.sqf`. Or: `fn_SERVER_JIP_loadUnitData.sqf` or `fn_JIP_SERVER_loadUnitData.sqf`. If you don't need to send a function call to JIP (Join In Progress) queue, just leave the `JIP` part off. Example: `fn_SERVER_loadUnitData.sqf` or `fn_CLIENT_loadUnitData.sqf`.
 
 ## Extension Settings
 
@@ -77,6 +78,13 @@ Hotfix: missing semicolon when using attributes on core functions.
 
 Support for persistent remote execution framework (`CfgRemoteExec.hpp`) parameters (function targets and JIP (Join In Progress)) for added security.
 
+### 1.0.1
+
+Fix showcase GIFs not showing.
+
+### 1.0.2
+
+Add documentation with examples how to make the Remote Execution Framework's function parameters persistent. (See "Requirements" on this page.)
 
 ---
 

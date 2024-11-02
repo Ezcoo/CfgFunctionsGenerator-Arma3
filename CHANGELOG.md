@@ -27,3 +27,10 @@
 
 ## [1.0.0]
 - Support for persistent remote execution framework (`CfgRemoteExec.hpp`) parameters (function targets and JIP (Join In Progress)) for added security.
+
+### [1.0.1]
+- Fix showcase GIFs not showing.
+
+### [1.0.2]
+
+- Add documentation with examples how to make the Remote Execution Framework's function parameters persistent. (See "Requirements" on the README page.)
