@@ -34,3 +34,8 @@
 ### [1.0.2]
 
 - Add documentation with examples how to make the Remote Execution Framework's function parameters persistent. (See "Requirements" on the README page.)
+
+### [1.0.3]
+
+- Make CfgRemoteExec.hpp generation more tolerant to typos/casing mistakes.
+- Fix a bug that allowed user to define function as JIP (Join In Progress) one without allowed target(s) getting specified.
