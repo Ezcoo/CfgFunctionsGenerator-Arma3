@@ -515,6 +515,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			if (!lineStr.includes('_ALL_')) {
 				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (ALL). Please use UPPERCASE formatting.")
 				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = ALL;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = ALL;" + "\n";
 			}
@@ -526,6 +527,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			if (!lineStr.includes('_SERVER_')) {
 				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (SERVER). Please use UPPERCASE formatting.")
 				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = SERVER;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = SERVER;" + "\n";
 			}
@@ -537,6 +539,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			if (!lineStr.includes('_CLIENT_')) {
 				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (CLIENT). Please use UPPERCASE formatting.")
 				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = CLIENT;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = CLIENT;" + "\n";
 			}
@@ -552,6 +555,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			if (!lineStr.includes('_JIP_')) {
 				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution JIP (Join In Progress) attribute. Please use UPPERCASE formatting.")
 				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				cfgRemoteExecFunctionParams += "\t\t\t" + "jip = 1;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "jip = 1;" + "\n";
 			}
