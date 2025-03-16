@@ -33,18 +33,26 @@ export function activate(context: vscode.ExtensionContext) {
 		outputChannel.appendLine("---");
 
 		// Define start of CfgFunctions.hpp
-		let content =
+		
+		const debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled');
+
+		let content = "";
+
+		if (debugEnabled) {
+			content +=
 			"#ifdef DEBUG_ENABLED_FULL\n" +
 			"allowFunctionsRecompile = 1;\n" +
 			"allowFunctionsLog = 1;\n" +
 			"#endif\n" +
-			"\n" +
-			"class CfgFunctions\n" +
-			"{\n" +
-			"\n" +
-			"\tclass " + developerTag + "\n" +
-			"\t{\n" +
 			"\n";
+		}
+
+		content += "class CfgFunctions\n" +
+		"{\n" +
+		"\n" +
+		"\tclass " + developerTag + "\n" +
+		"\t{\n" +
+		"\n";
 
 		const currentFileString = vscode.window.activeTextEditor?.document.uri.fsPath.toString() ?? "";
 		context.workspaceState.update('cfgFunctionsPathInProject', currentFileString);
@@ -390,14 +398,23 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 			"\tclass " + "Functions" + "\n" +
 			"\t{\n" +
 			"\n" +
-			"\t\t" + "// Only whitelisted functions are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n" +
-			"\t\t" + "mode = 1;" + 
-			"\n" +
-			"\t\t" + "// JIP flag can not be set (unless overridden by a function or command declaration itself). The default value '0' should be preferred. Other values: 1 = JIP flag can always be set" + "\n" +
-			"\t\t" + "jip = 0;" +
+			"\t\t" + "// --------------------------------" + "\n" +
+			"\t\t" + "// MODE values:" + "\n" +
+			"\t\t" + "// 0 = Remote execution blocked completely." + "\n" +
+			"\t\t" + "// 1 = Only whitelisted functions are allowed. (RECOMMENDED)" + "\n" +
+			"\t\t" + "// 2 = remote execution fully allowed (no whitelist) - not recommended for production." + "\n" +
+			"\t\t" + "\n" +
+			"\t\t" + "// Only whitelisted functions are allowed." + "\n" +
+			"\t\t" + "mode = 1;" +
+			"\n\n" + "\n" +
+			"\t\t" + "// --------------------------------" + "\n" +
+			"\t\t" + "// JIP values:" + "\n" +
+			"\t\t" + "// 0 = JIP flag can be set by function or command only if they override the JIP flag in their declaration in this file. (RECOMMENDED)" + "\n" +
+			"\t\t" + "// 1 = JIP flag can always be set - not recommended for production." + "\n" +
+			"\t\t" + "\n" +
+			"\t\t" + "// JIP flag can not be set (unless overridden by a function or command declaration itself)." + "\n" + 
+			"\t\t" + "jip = 0;" + 
 			"\n\n" +
-			"\t\t" + "// Note that 'allowedTargets' properties in the list below can target all machines by default! Changing them on a case-by-case basis is highly recommended." + "\n" +
-			"\t\t" + "// Other (and recommended) values: 1 = only clients as allowed target, 2 = only server as allowed target" +
 			"\n\n";
 
 	const cfgFunctionsPath = vscode.window.activeTextEditor?.document.uri.fsPath;
