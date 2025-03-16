@@ -25,7 +25,7 @@
 
 - Hotfix: missing semicolon when using attributes on core functions.
 
-## [1.0.0]
+# [1.0.0]
 - Support for persistent remote execution framework (`CfgRemoteExec.hpp`) parameters (function targets and JIP (Join In Progress)) for added security.
 
 ### [1.0.1]
@@ -39,3 +39,9 @@
 
 - Make CfgRemoteExec.hpp generation more tolerant to typos/casing mistakes.
 - Fix a bug that allowed user to define function as JIP (Join In Progress) one without allowed target(s) getting specified.
+
+## [1.1.0]
+
+- Add toggle to enable or disable allowing debug mode in Functions library.
+- Improve documentation in `CfgRemoteExec.hpp`.
+- Update project description.
