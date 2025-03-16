@@ -3,7 +3,7 @@
   "displayName": "CfgFunctions & CfgRemoteExec Generator (Arma 3)",
   "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions and CfgRemoteExec for Arma 3.",
   "icon": "logo/icon.png",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "publisher": "Ezcoo",
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
@@ -65,6 +65,11 @@
           "type": "string",
           "default": "YOUR_TAG_HERE",
           "description": "Specifies your personal tag to prevent duplicate functions, e.g. in projects with dependencies."
+        },
+        "debugEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow debug flag to be set in CfgFunctions.hpp (useful for development)."
         }
       }
     },
