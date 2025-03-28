@@ -45,3 +45,7 @@
 - Add toggle to enable or disable allowing debug mode in Functions library.
 - Improve documentation in `CfgRemoteExec.hpp`.
 - Update project description.
+
+## [1.2.0]
+
+- Add option to add PBO prefix (necessary, if developing an addon instead of a mission).

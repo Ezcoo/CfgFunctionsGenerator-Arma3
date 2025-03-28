@@ -36,6 +36,12 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		const debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled');
 
+		let pboPrefix:string = vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
+
+		if (pboPrefix !== "") {
+			pboPrefix = pboPrefix + path.sep; 
+		};
+
 		let content = "";
 
 		if (debugEnabled) {
@@ -96,7 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (sqfFiles.length > 0) {
 				sqfFiles.forEach(function(sqfFile) {
-					const formattedClass = formatFunctionClass(vscode.Uri.file(sqfFile), outputChannel);
+					const formattedClass = formatFunctionClass(vscode.Uri.file(sqfFile), outputChannel, pboPrefix);
 
 					if (formattedClass !== "") {
 						content = content + "\t\t\t" + formattedClass + "\n";
@@ -159,7 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate(): void {}
 
-function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel) {
+function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel, pboPrefix: string) {
 	let functionName = "";
 	let preInit = false;
 	let postInit = false;
@@ -264,7 +270,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 
 			functionName = cleanUnderscores(functionName);
 
-			functionPath = functionDirPath + path.sep + sqfFilename;
+			functionPath = pboPrefix + functionDirPath + path.sep + sqfFilename;
 
 			if (depth > 2) {
 				let functionDirPathSplitReversed = functionDirPathSplit.reverse();
