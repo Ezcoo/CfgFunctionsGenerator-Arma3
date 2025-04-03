@@ -49,3 +49,8 @@
 ## [1.2.0]
 
 - Add option to add PBO prefix (necessary, if developing an addon instead of a mission).
+
+## [1.3.0]
+
+- Add option to override extension's global settings with local settings file (especially useful for complex projects and/or addon development). See README -> Extension Settings for more information.
+- Fix empty category folders breaking the generation of `CfgFunctions.hpp`.

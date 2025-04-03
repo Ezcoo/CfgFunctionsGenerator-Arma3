@@ -32,6 +32,7 @@ This extension is somewhat opinionated when it comes to secure scripting. It int
     * Example: `fn_CLIENT_JIP_getCarKeys.sqf` or `fn_JIP_CLIENT_getCarKeys.sqf`. Or: `fn_SERVER_JIP_loadUnitData.sqf` or `fn_JIP_SERVER_loadUnitData.sqf`. 
     * If you don't need to send a function call to JIP (Join In Progress) queue, just leave the `JIP` part off. Example: `fn_SERVER_loadUnitData.sqf` or `fn_CLIENT_loadUnitData.sqf`.
     * Also adding `JIP` parameter only is supported for special cases, but it's not recommended. If the `JIP` only gets defined, the remote execution will allow all targets. (It's better to have separate functions for targeting server and clients.)
+* Support for loading and overriding global extension settings with local config file (especially useful in complex projects). (Since v1.3.0)
 
 
 ## Requirements
@@ -41,14 +42,22 @@ This extension is somewhat opinionated when it comes to secure scripting. It int
 * Filenames of SQF files to be included must start with `'fn_'`.
 * SQF files must be located in _subfolder_ of `MISSION_OR_CAMPAIGN_ROOT/functions/` folder.
 * `CfgFunctions.hpp` file needs to be open and the active file in the editor.
-* To generate `CfgRemoteExec.hpp`, you need to have `CfgFunctions.hpp` open and as active file in the editor.
+* To generate `CfgRemoteExec.hpp`, you must have `CfgFunctions.hpp` open and as active file in the editor.
 
 
 ## Extension Settings
 
-* Personal/project tag to avoid naming conflicts.
-* Toggle to enable/disable allowing debug mode (functions recompile and logging).
-
+* Global settings:
+  * Personal/project tag to avoid naming conflicts.
+  * Toggle to enable/disable allowing debug mode (functions recompile and logging).
+  * PBO prefix for addon development and/or complex projects.
+* Local settings (override of global settings):
+  * Create a config file named exactly `cfgFunctions.txt` in the same directory with `CfgFunctions.hpp`. Ensure that the file has `.txt` as its file extension. (Pay special attention to this on Windows, as Windows hides file extensions by default.)
+    * `cfgFunctions.txt` supports overriding any combination of the three global settings with formatting `settingName=value`, each on their own line. Note that there must be no whitespace in any line.
+      * Examples of local config (`cfgFunctions.txt`) settings:
+        * `developerTag=yourTag`
+        * `pboPrefix=yourPboPrefix`
+        * `debugEnabled=true`
 
 ## Known Issues
 
@@ -60,7 +69,9 @@ This extension is somewhat opinionated when it comes to secure scripting. It int
   * 2. you need to have generated `CfgFunctions.hpp` at least once, and 
   * 3. you need to have the `CfgFunctions.hpp` file active in the editor (by e.g. clicking on it's contents in the normal editor view) when you run the `Generate CfgRemoteExec template (Arma 3)` task. (`Ctrl` + `Shift` + `P`)
 
+
 Bug reports are highly appreciated!
+
 
 ## Release Notes
 
@@ -104,7 +115,8 @@ Add documentation with examples how to make the Remote Execution Framework's fun
 
 ### 1.0.3
 
-Make `CfgRemoteExec.hpp` generation more tolerant to typos/casing mistakes & fix a bug that allowed user to define function as JIP (Join In Progress) one without allowed target(s) getting specified.
+Make `CfgRemoteExec.hpp` generation more tolerant to typos/casing mistakes.
+Fix a bug that allowed user to define function as JIP (Join In Progress) one without allowed target(s) getting specified.
 
 ### 1.1.0
 
@@ -115,6 +127,11 @@ Update project description.
 ### 1.2.0
 
 Add option to add PBO prefix (necessary, if developing an addon instead of a mission).
+
+### 1.3.0
+
+Add option to override extension's global settings with local settings file (especially useful for complex projects and/or addon development). Read README -> Extension Settings for more information.
+Fix empty category folders breaking the generation of `CfgFunctions.hpp`.
 
 ---
 
