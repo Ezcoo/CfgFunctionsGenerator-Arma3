@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 		outputChannel.appendLine("---");
 
 		if (!developerTagDefined) {
-			let developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+			developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? '';
 		}
 
 		if(developerTag === 'YOUR_TAG_HERE') {
@@ -90,15 +90,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 		outputChannel.appendLine('Your developer/project tag is: ' + developerTag);
 		outputChannel.appendLine("---");
-
+ 
 		// Define start of CfgFunctions.hpp
 		
 		if (!debugEnabledDefined) {
-			const debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled');
+			debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled') ?? false;
 		}
 
 		if (!pboPrefixDefined) {
-			let pboPrefix:string = vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
+			pboPrefix= vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
 		}
 
 		if (pboPrefix !== "") {
