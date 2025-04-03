@@ -18,7 +18,66 @@ export function activate(context: vscode.ExtensionContext) {
 		outputChannel.appendLine("###  ARMA 3 CFGFUNCTIONS GENERATOR  ###");
 		outputChannel.appendLine("---");
 
-		const developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+		let developerTagDefined = false;
+		let developerTag = 'YOUR_TAG_HERE';
+
+		let pboPrefixDefined = false;
+		let pboPrefix:string = '';
+
+		let debugEnabledDefined = false;
+		let debugEnabled = false;
+
+		try {
+			const currentPath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
+			const parentPath = path.dirname(currentPath);
+			const localSettingsFile = fs.readFileSync(parentPath + path.sep + 'cfgFunctions.txt', 'utf-8').toString();
+			const localSettings = localSettingsFile.split(/\r?\n/);
+
+			const localSettingsLines = localSettings.values();
+
+			for (const line of localSettingsLines) {
+				let localSetting = line.split(/[=]/);
+				let parameter = localSetting[0];
+				if (parameter == "developerTag") {
+					let value = localSetting[1]
+					developerTag = value;
+					developerTagDefined = true;
+				} else if (parameter == "pboPrefix") {
+					let value = localSetting[1];
+					pboPrefix = value;
+					pboPrefixDefined = true;
+				} else if (parameter == "debugEnabled") {
+					let value = localSetting[1];
+					if (value == "true") {
+						debugEnabled = true;
+						debugEnabledDefined = true;
+					} else if (value == "false") {
+						debugEnabled = false;
+						debugEnabledDefined = true;
+					}
+				}
+			}
+		} catch (error) {
+			outputChannel.appendLine("No project specific config file was loaded. (You can safely ignore this message unless you are trying to use a project config file.)");
+		}
+
+		if (developerTagDefined) {
+			outputChannel.appendLine("Loaded developer tag from local config file with value: " + developerTag);
+		}
+
+		if (pboPrefixDefined) {
+			outputChannel.appendLine("Loaded PBO prefix from local config file with value: " + pboPrefix);
+		}
+
+		if (debugEnabledDefined) {
+			outputChannel.appendLine("Loaded functions' debug parameter from local config file with value: " + debugEnabled);
+		}
+
+		outputChannel.appendLine("---");
+
+		if (!developerTagDefined) {
+			let developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
+		}
 
 		if(developerTag === 'YOUR_TAG_HERE') {
 			vscode.window.showErrorMessage('Your developer/project tag is not yet defined in extension settings! Please define it via VS Code -> Settings -> Extensions and try again.');
@@ -34,31 +93,35 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Define start of CfgFunctions.hpp
 		
-		const debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled');
+		if (!debugEnabledDefined) {
+			const debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled');
+		}
 
-		let pboPrefix:string = vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
+		if (!pboPrefixDefined) {
+			let pboPrefix:string = vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
+		}
 
 		if (pboPrefix !== "") {
 			pboPrefix = pboPrefix + path.sep; 
-		};
+		}
 
 		let content = "";
 
 		if (debugEnabled) {
 			content +=
-			"#ifdef DEBUG_ENABLED_FULL\n" +
-			"allowFunctionsRecompile = 1;\n" +
-			"allowFunctionsLog = 1;\n" +
-			"#endif\n" +
-			"\n";
+				"#ifdef DEBUG_ENABLED_FULL\n" +
+				"allowFunctionsRecompile = 1;\n" +
+				"allowFunctionsLog = 1;\n" +
+				"#endif\n" +
+				"\n";
 		}
 
 		content += "class CfgFunctions\n" +
-		"{\n" +
-		"\n" +
-		"\tclass " + developerTag + "\n" +
-		"\t{\n" +
-		"\n";
+			"{\n" +
+			"\n" +
+			"\tclass " + developerTag + "\n" +
+			"\t{\n" +
+			"\n";
 
 		const currentFileString = vscode.window.activeTextEditor?.document.uri.fsPath.toString() ?? "";
 		context.workspaceState.update('cfgFunctionsPathInProject', currentFileString);
@@ -109,14 +172,19 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				});
 			} else {
-				if (!focusWarningShown) {
-					vscode.window.showErrorMessage("Something went wrong! Make sure that you've clicked the editor area of your CfgFunctions.hpp before clicking the generate button.");
-					outputChannel.appendLine("GENERIC ERROR");
-					outputChannel.appendLine("Something went wrong! Make sure that you've clicked the editor area of your CfgFunctions.hpp before clicking the generate button.");
-					outputChannel.appendLine("---");
-					focusWarningShown = true;
-					errors = true;
-					return;
+				if (sqfFiles.length == 0) {
+					vscode.window.showWarningMessage("Empty category detected when generating CfgFunctions.");
+					outputChannel.appendLine("Empty category \"" + category + "\" detected.");
+				} else {
+					if (!focusWarningShown) {
+						vscode.window.showErrorMessage("Something went wrong! Make sure that you've clicked the editor area of your CfgFunctions.hpp before clicking the generate button.");
+						outputChannel.appendLine("GENERIC ERROR");
+						outputChannel.appendLine("Something went wrong! Make sure that you've clicked the editor area of your CfgFunctions.hpp before clicking the generate button.");
+						outputChannel.appendLine("---");
+						focusWarningShown = true;
+						errors = true;
+						return;
+					}
 				}
 			}
 
@@ -253,7 +321,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 			functionName = cleanUnderscores(functionName);
 
 			if (functionName.toLowerCase().startsWith('client')) {
-				functionName = functionName.replace(regExpClient, "");
+				functionName = functionName.replace(regExpClient, ""); 	
 			}
 
 			functionName = cleanUnderscores(functionName);
