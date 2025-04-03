@@ -54,3 +54,11 @@
 
 - Add option to override extension's global settings with local settings file (especially useful for complex projects and/or addon development). See README -> Extension Settings for more information.
 - Fix empty category folders breaking the generation of `CfgFunctions.hpp`.
+
+## [1.3.1]
+
+- Hotfix developer tag not being set if it was imported from global config (extension settings).
+
+## [1.3.2]
+
+- Hotfix possible issues with PBO prefix and debug flag (not being set properly if they were imported from global config i.e. extension settings).
