@@ -8,102 +8,56 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const outputChannel = vscode.window.createOutputChannel("Arma 3 CfgFunctions.hpp Generator");
 
+	let muteChannel = true;
+
+	outputChannel.clear();
+	outputChannel.show();
+
+	if (!muteChannel) {
+		outputChannel.appendLine("###  ARMA 3 CFGFUNCTIONS GENERATOR  ###");
+		outputChannel.appendLine("---");
+	}
+
+	let options = getOptions(outputChannel, muteChannel);
+
+	let developerTag = String(options[0]);
+
+	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
+
+	loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+
+
 	let disposableCfgFunctionsGenerator = vscode.commands.registerCommand('cfgfunctions.generateCfgFunctions', async () => {
- 
+
 		let errors = false;
-		
+
 		outputChannel.clear();
 		outputChannel.show();
 
 		outputChannel.appendLine("###  ARMA 3 CFGFUNCTIONS GENERATOR  ###");
 		outputChannel.appendLine("---");
 
-		let developerTagDefined = false;
-		let developerTag = 'YOUR_TAG_HERE';
+		let muteOutputChannel = false;
 
-		let pboPrefixDefined = false;
-		let pboPrefix:string = '';
+		const options = getOptions(outputChannel, muteOutputChannel);
 
-		let debugEnabledDefined = false;
-		let debugEnabled = false;
+		let developerTag = String(options[0]);
 
-		try {
-			const currentPath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
-			const parentPath = path.dirname(currentPath);
-			const localSettingsFile = fs.readFileSync(parentPath + path.sep + 'cfgFunctions.txt', 'utf-8').toString();
-			const localSettings = localSettingsFile.split(/\r?\n/);
+		let pboPrefix = String(options[1]);
 
-			const localSettingsLines = localSettings.values();
-
-			for (const line of localSettingsLines) {
-				let localSetting = line.split(/[=]/);
-				let parameter = localSetting[0];
-				if (parameter == "developerTag") {
-					let value = localSetting[1]
-					developerTag = value;
-					developerTagDefined = true;
-				} else if (parameter == "pboPrefix") {
-					let value = localSetting[1];
-					pboPrefix = value;
-					pboPrefixDefined = true;
-				} else if (parameter == "debugEnabled") {
-					let value = localSetting[1];
-					if (value == "true") {
-						debugEnabled = true;
-						debugEnabledDefined = true;
-					} else if (value == "false") {
-						debugEnabled = false;
-						debugEnabledDefined = true;
-					}
-				}
-			}
-		} catch (error) {
-			outputChannel.appendLine("No project specific config file was loaded. (You can safely ignore this message unless you are trying to use a project config file.)");
-		}
-
-		if (developerTagDefined) {
-			outputChannel.appendLine("Loaded developer tag from local config file with value: " + developerTag);
-		}
-
-		if (pboPrefixDefined) {
-			outputChannel.appendLine("Loaded PBO prefix from local config file with value: " + pboPrefix);
-		}
-
-		if (debugEnabledDefined) {
-			outputChannel.appendLine("Loaded functions' debug parameter from local config file with value: " + debugEnabled);
-		}
-
-		outputChannel.appendLine("---");
-
-		if (!developerTagDefined) {
-			developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? '';
-		}
-
-		if(developerTag === 'YOUR_TAG_HERE') {
-			vscode.window.showErrorMessage('Your developer/project tag is not yet defined in extension settings! Please define it via VS Code -> Settings -> Extensions and try again.');
-			errors = true;
-			// return;
-		}
+		let debugEnabled = options[2];
 
 		outputChannel.appendLine("Starting to generate CfgFunctions.hpp.");
 		outputChannel.appendLine("---");
 
 		outputChannel.appendLine('Your developer/project tag is: ' + developerTag);
 		outputChannel.appendLine("---");
+
+		if(developerTag === 'YOUR_TAG_HERE') {
+			vscode.window.showErrorMessage('Your developer/project tag is not defined yet in extension settings! Please define it via VS Code -> Settings -> Extensions or local config file and try again.');
+		}
  
 		// Define start of CfgFunctions.hpp
-		
-		if (!debugEnabledDefined) {
-			debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled') ?? false;
-		}
-
-		if (!pboPrefixDefined) {
-			pboPrefix= vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
-		}
-
-		if (pboPrefix !== "") {
-			pboPrefix = pboPrefix + path.sep; 
-		}
 
 		let content = "";
 
@@ -208,18 +162,19 @@ export function activate(context: vscode.ExtensionContext) {
 			outputChannel.appendLine("");
 			outputChannel.appendLine("Generation of CfgFunctions.hpp finished.");
 		}
+
+	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
+
+	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+
+	if (cfgFunctionsFncNames === undefined || cfgFunctionsPathInProject === '') {
+		return;
+	}
 		
 	});
 
 	context.subscriptions.push(disposableCfgFunctionsGenerator);
 
-	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
-
-	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject);
-
-	if (cfgFunctionsFncNames === undefined || cfgFunctionsPathInProject === '') {
-		return;
-	}
 
 	let disposableCfgRemoteExecGenerator = vscode.commands.registerCommand('cfgfunctions.generateCfgRemoteExec', async () => { 
 		
@@ -232,6 +187,97 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): void {}
+
+function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
+
+	let developerTagDefined = false;
+	let developerTag = 'YOUR_TAG_HERE';
+
+	let pboPrefixDefined = false;
+	let pboPrefix:string = '';
+
+	let debugEnabledDefined = false;
+	let debugEnabled = false;
+
+	try {
+		const currentPath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
+		const parentPath = path.dirname(currentPath);
+		const localSettingsFile = fs.readFileSync(parentPath + path.sep + 'cfgFunctions.txt', 'utf-8').toString();
+		const localSettings = localSettingsFile.split(/\r?\n/);
+
+		const localSettingsLines = localSettings.values();
+
+		for (const line of localSettingsLines) {
+			let localSetting = line.split(/[=]/);
+			let parameter = localSetting[0];
+			if (parameter == "developerTag") {
+				let value = localSetting[1]
+				developerTag = value;
+				developerTagDefined = true;
+			} else if (parameter == "pboPrefix") {
+				let value = localSetting[1];
+				pboPrefix = value;
+				pboPrefixDefined = true;
+			} else if (parameter == "debugEnabled") {
+				let value = localSetting[1];
+				if (value == "true") {
+					debugEnabled = true;
+					debugEnabledDefined = true;
+				} else if (value == "false") {
+					debugEnabled = false;
+					debugEnabledDefined = true;
+				}
+			}
+		}
+	} catch (error) {
+		if (!muteChannel) {
+			outputChannel.appendLine("Project specific config override file was not found. (You can safely ignore this message unless you are trying to use a local config file overriding global settings.)");
+		}
+	}
+
+	if (developerTagDefined) {
+		if (!muteChannel) {
+			outputChannel.appendLine("Loaded developer tag from local config file with value: " + developerTag);
+		}
+	}
+
+	if (pboPrefixDefined) {
+		if (!muteChannel) {
+			outputChannel.appendLine("Loaded PBO prefix from local config file with value: " + pboPrefix);
+		}
+	}
+
+	if (debugEnabledDefined) {
+		if (!muteChannel) {
+			outputChannel.appendLine("Loaded functions' debug parameter from local config file with value: " + debugEnabled);
+		}
+	}
+
+	if (!muteChannel) {
+		outputChannel.appendLine("---");
+	}
+
+	if (!developerTagDefined) {
+		developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? 'YOUR_TAG_HERE';
+		if (developerTag == '') {
+			developerTag = 'YOUR_TAG_HERE';
+		}
+	}
+	
+	if (!debugEnabledDefined) {
+		debugEnabled = vscode.workspace.getConfiguration().get('debugEnabled') ?? false;
+	}
+
+	if (!pboPrefixDefined) {
+		pboPrefix= vscode.workspace.getConfiguration().get('pboPrefix') ?? '';
+	}
+
+	if (pboPrefix !== "") {
+		pboPrefix = pboPrefix + path.sep; 
+	}
+
+	return [developerTag, pboPrefix, debugEnabled];
+}
 
 function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel, pboPrefix: string) {
 	let functionName = "";
@@ -401,7 +447,7 @@ function coreFunctionName(functionName: string, functionDirPath: string, preInit
 	return "class " + functionName + " { file = \"" + functionDirPath + "\"; };";
 }
 
-function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctionsPath: string) {
+function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctionsPath: string, developerTag: string) {
 
 	if (cfgFunctionsPath === undefined) {
 		return;
@@ -424,8 +470,6 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctio
 	let cfgFunctionsFncsFormatted:string[] = [];
 
 	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
- 
-	const developerTag:string = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? 'YOUR_TAG_HERE';
 
 	for (const line of cfgFunctionsFncsIterator) {
 		const lineStr = line.toString();
@@ -527,9 +571,12 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 	let cfgFunctionsFncsFormatted = [];
 	
 	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
-	
-	const developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag');
-	
+
+	let muteChannel = false;
+
+	const options = getOptions(outputChannelRemoteExec, muteChannel);
+	const developerTag = options[0];
+
 	for (const line of cfgFunctionsFncsIterator) {
 		const lineStr = line.toString();
 		const functionName = formatRemoteExecFunction(String(developerTag), lineStr, outputChannelRemoteExec);
