@@ -62,3 +62,7 @@
 ## [1.3.2]
 
 - Hotfix possible issues with PBO prefix and debug flag (not being set properly if they were imported from global config i.e. extension settings).
+
+## [1.4.0]
+
+- Fix autocompletion of functions becoming bugged easily. (Because of limitations of Visual Studio Code's extension API, please note that you still need to generate CfgFunctions once when starting development after opening the editor to ensure that your developer tag is set correctly.)
