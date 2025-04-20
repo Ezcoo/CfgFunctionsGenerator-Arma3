@@ -55,14 +55,19 @@
 - Add option to override extension's global settings with local settings file (especially useful for complex projects and/or addon development). See README -> Extension Settings for more information.
 - Fix empty category folders breaking the generation of `CfgFunctions.hpp`.
 
-## [1.3.1]
+### [1.3.1]
 
 - Hotfix developer tag not being set if it was imported from global config (extension settings).
 
-## [1.3.2]
+### [1.3.2]
 
 - Hotfix possible issues with PBO prefix and debug flag (not being set properly if they were imported from global config i.e. extension settings).
 
 ## [1.4.0]
 
 - Fix autocompletion of functions becoming bugged easily. (Because of limitations of Visual Studio Code's extension API, please note that you still need to generate CfgFunctions once when starting development after opening the editor to ensure that your developer tag is set correctly.)
+
+## [1.5.0]
+
+- Add an extension setting: toggle allowing unrestrained remote execution (for development purposes).
+- Fix function duplication in autocompletion of functions.

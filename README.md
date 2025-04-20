@@ -51,6 +51,7 @@ This extension is somewhat opinionated when it comes to secure scripting. It int
   * Personal/project tag to avoid naming conflicts.
   * Toggle to enable/disable allowing debug mode (functions recompile and logging).
   * PBO prefix for addon development and/or complex projects.
+  * Toggle to enable/disable unrestrained execution with engine based remote execution framework.
 * Local settings (override of global settings):
   * Create a config file named exactly `cfgFunctions.txt` in the same directory with `CfgFunctions.hpp`. Ensure that the file has `.txt` as its file extension. (Pay special attention to this on Windows, as Windows hides file extensions by default.)
     * `cfgFunctions.txt` supports overriding any combination of the three global settings with formatting `settingName=value`, each on their own line. Note that there must be no whitespace in any line.
@@ -58,6 +59,7 @@ This extension is somewhat opinionated when it comes to secure scripting. It int
         * `developerTag=yourTag`
         * `pboPrefix=yourPboPrefix`
         * `debugEnabled=true`
+        * `allowRemoteExec=true`
 
 ## Known Issues
 
@@ -144,6 +146,11 @@ Hotfix possible issues with PBO prefix and debug flag (not being set properly if
 ### 1.4.0
 
 Fix autocompletion of functions becoming bugged easily. (Because of limitations of Visual Studio Code's extension API, please note that you still need to generate CfgFunctions once when starting development after opening the editor to ensure that your developer tag is set correctly.)
+
+### 1.5.0
+
+Add an extension setting: toggle allowing unrestrained remote execution (for development purposes).
+Fix function duplication in autocompletion of functions.
 
 ---
 
