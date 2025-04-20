@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
 
-	loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+	var disposableCfgFunctionsCompletion = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
 
 
 	let disposableCfgFunctionsGenerator = vscode.commands.registerCommand('cfgfunctions.generateCfgFunctions', async () => {
@@ -165,12 +165,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
 
-	const cfgFunctionsFncNames = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+	disposableCfgFunctionsCompletion?.dispose();
 
-	if (cfgFunctionsFncNames === undefined || cfgFunctionsPathInProject === '') {
-		return;
-	}
-		
+	disposableCfgFunctionsCompletion = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+
 	});
 
 	context.subscriptions.push(disposableCfgFunctionsGenerator);
@@ -198,6 +196,9 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 
 	let debugEnabledDefined = false;
 	let debugEnabled = false;
+
+	let allowRemoteExecDefined = false;
+	let allowRemoteExec = false;
 
 	try {
 		const currentPath = vscode.window.activeTextEditor?.document.uri.fsPath ?? '';
@@ -227,6 +228,15 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 					debugEnabled = false;
 					debugEnabledDefined = true;
 				}
+			} else if (parameter == "allowRemoteExec") {
+				let value = localSetting[1];
+				if (value == "true") {
+					allowRemoteExec = true;
+					allowRemoteExecDefined = true;
+				} else if (value == "false") {
+					allowRemoteExec = false;
+					allowRemoteExecDefined = true;
+				}
 			}
 		}
 	} catch (error) {
@@ -253,6 +263,12 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 		}
 	}
 
+	if (allowRemoteExecDefined) {
+		if (!muteChannel) {
+			outputChannel.appendLine("Loaded unrestrained remote execution allowed parameter from local config with value: " + allowRemoteExec);
+		}
+	}
+
 	if (!muteChannel) {
 		outputChannel.appendLine("---");
 	}
@@ -276,7 +292,11 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 		pboPrefix = pboPrefix + path.sep; 
 	}
 
-	return [developerTag, pboPrefix, debugEnabled];
+	if (!allowRemoteExecDefined) {
+		allowRemoteExec = vscode.workspace.getConfiguration().get('allowRemoteExec') ?? false;
+	}
+
+	return [developerTag, pboPrefix, debugEnabled, allowRemoteExec];
 }
 
 function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.OutputChannel, pboPrefix: string) {
@@ -486,7 +506,10 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctio
 			for (const fnc of cfgFunctionsFncsFormatted) {
 				
 				const cmpItem = new vscode.CompletionItem(fnc, vscode.CompletionItemKind.Function);
-				cmpItems.push(cmpItem);
+
+				if (!(cmpItems.includes(cmpItem))) {
+					cmpItems.push(cmpItem);
+				}
 			}
 
 			return cmpItems;
@@ -495,13 +518,19 @@ function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctio
 	}
 
 	);
-		
+	
 	context.subscriptions.push(provider);
 
-	return cfgFunctionsFncsFormatted;
+	return provider;
 }
 
 function generateCfgRemoteExec(context: vscode.ExtensionContext) {
+
+	let muteChannel = false;
+
+	const outputChannel = vscode.window.createOutputChannel("Arma 3 CfgRemoteExec.hpp Generator");
+
+	const options = getOptions(outputChannel, muteChannel);
 
 	let errorsFound = false;
 	let content =
@@ -522,9 +551,16 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 			"\t\t" + "// 1 = Only whitelisted functions are allowed. (RECOMMENDED)" + "\n" +
 			"\t\t" + "// 2 = remote execution fully allowed (no whitelist) - not recommended for production." + "\n" +
 			"\t\t" + "\n" +
-			"\t\t" + "// Only whitelisted functions are allowed." + "\n" +
-			"\t\t" + "mode = 1;" +
-			"\n\n" + "\n" +
+			"\t\t" + "// Only whitelisted functions are allowed." + "\n";
+
+			// AllowRemoteExec parameter
+			if (options[3] == true) {
+				content += "\t\t" + "mode = 2;";
+			} else {
+				content += "\t\t" + "mode = 1;";
+			}
+			
+			content += "\n\n" + "\n" +
 			"\t\t" + "// --------------------------------" + "\n" +
 			"\t\t" + "// JIP values:" + "\n" +
 			"\t\t" + "// 0 = JIP flag can be set by function or command only if they override the JIP flag in their declaration in this file. (RECOMMENDED)" + "\n" +
@@ -572,9 +608,8 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 	
 	const cfgFunctionsFncsIterator = cfgFunctionsLinesFiltered.values();
 
-	let muteChannel = false;
+	muteChannel = false;
 
-	const options = getOptions(outputChannelRemoteExec, muteChannel);
 	const developerTag = options[0];
 
 	for (const line of cfgFunctionsFncsIterator) {
@@ -595,8 +630,16 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 
 	content += "\n\n" + 
 		"class Commands" + "\n" + "\t{" + "\n" +
-		"\t\t" + "// Only whitelisted commands are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n" +
-		"\t\t" + "mode = 1;" + "\n\n" +
+		"\t\t" + "// Only whitelisted commands are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n";
+		
+		// AllowRemoteExec parameter
+		if (options[3] == true) {
+			content += "\t\t" + "mode = 2;";
+		} else {
+			content += "\t\t" + "mode = 1;";
+		}
+
+		content += "\n\n" +
 		"\t\t" + "// Note that blocking raw SQF command input is recommended. You should whitelist only the functions above (and not pure SQF commands!) because of security reasons." + "\n" +
 		"\t\t" + "// See more info (and a super useful trick to increase security of your project) at the comments seffction of https://community.bistudio.com/wiki/remoteExec" + "\n" +
 		"\t};" + "\n\n" +
