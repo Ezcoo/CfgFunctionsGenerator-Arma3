@@ -3,7 +3,7 @@
   "displayName": "CfgFunctions & CfgRemoteExec Generator (Arma 3)",
   "description": "Adds an editor button for automatic (re)generation of custom CfgFunctions and CfgRemoteExec for Arma 3.",
   "icon": "logo/icon.png",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "publisher": "Ezcoo",
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
@@ -75,6 +75,11 @@
           "type": "string",
           "default": "",
           "description": "Define PBO prefix (necessary if developing an addon)."
+        },
+        "allowRemoteExec": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow unrestrained remote execution (useful during development)."
         }
       }
     },
