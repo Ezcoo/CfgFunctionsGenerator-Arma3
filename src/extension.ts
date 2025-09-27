@@ -126,7 +126,7 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				});
 			} else {
-				if (sqfFiles.length == 0) {
+				if (sqfFiles.length === 0) {
 					vscode.window.showWarningMessage("Empty category detected when generating CfgFunctions.");
 					outputChannel.appendLine("Empty category \"" + category + "\" detected.");
 				} else {
@@ -211,29 +211,29 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 		for (const line of localSettingsLines) {
 			let localSetting = line.split(/[=]/);
 			let parameter = localSetting[0];
-			if (parameter == "developerTag") {
-				let value = localSetting[1]
+			if (parameter === "developerTag") {
+				let value = localSetting[1];
 				developerTag = value;
 				developerTagDefined = true;
-			} else if (parameter == "pboPrefix") {
+			} else if (parameter === "pboPrefix") {
 				let value = localSetting[1];
 				pboPrefix = value;
 				pboPrefixDefined = true;
-			} else if (parameter == "debugEnabled") {
+			} else if (parameter === "debugEnabled") {
 				let value = localSetting[1];
-				if (value == "true") {
+				if (value === "true") {
 					debugEnabled = true;
 					debugEnabledDefined = true;
-				} else if (value == "false") {
+				} else if (value === "false") {
 					debugEnabled = false;
 					debugEnabledDefined = true;
 				}
-			} else if (parameter == "allowRemoteExec") {
+			} else if (parameter === "allowRemoteExec") {
 				let value = localSetting[1];
-				if (value == "true") {
+				if (value === "true") {
 					allowRemoteExec = true;
 					allowRemoteExecDefined = true;
-				} else if (value == "false") {
+				} else if (value === "false") {
 					allowRemoteExec = false;
 					allowRemoteExecDefined = true;
 				}
@@ -275,7 +275,7 @@ function getOptions(outputChannel: vscode.OutputChannel, muteChannel: boolean) {
 
 	if (!developerTagDefined) {
 		developerTag = vscode.workspace.getConfiguration().get('cfgfunctionsTag') ?? 'YOUR_TAG_HERE';
-		if (developerTag == '') {
+		if (developerTag === '') {
 			developerTag = 'YOUR_TAG_HERE';
 		}
 	}
@@ -348,8 +348,8 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 				preInit = true;
 
 				if (!functionName.startsWith('preInit')) {
-					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"preInit\" attribute. Please use camelCase formatting.")
-					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.")
+					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"preInit\" attribute. Please use camelCase formatting.");
+					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.");
 				}
 
 				functionName = functionName.replace("preInit", "");
@@ -359,8 +359,8 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 				postInit = true;
 
 				if (!functionName.startsWith('postInit')) {
-					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"postInit\" attribute. Please use camelCase formatting.")
-					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.")
+					outputChannel.appendLine("Function \"" + functionName + "\" has misnamed \"postInit\" attribute. Please use camelCase formatting.");
+					vscode.window.showWarningMessage("There were warnings during creation of CfgFunctions. Check the output channel for more information.");
 				}
 
 				functionName = functionName.replace("postInit", "");
@@ -371,10 +371,10 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 			const regExpAll = /all/i;
 			const regExpServer = /server/i;
 			const regExpClient = /client/i;
-			const JIPallowed = /jip/i;
+			const jipAllowed = /jip/i;
 
 			if (functionName.toLowerCase().startsWith('jip')) {
-				functionName = functionName.replace(JIPallowed, "");
+				functionName = functionName.replace(jipAllowed, "");
 			}
 
 			functionName = cleanUnderscores(functionName);
@@ -399,7 +399,7 @@ function formatFunctionClass(sqfFileURI: vscode.Uri, outputChannel: vscode.Outpu
 			functionName = cleanUnderscores(functionName);
 
 			if (functionName.toLowerCase().startsWith('jip')) {
-				functionName = functionName.replace(JIPallowed, "");
+				functionName = functionName.replace(jipAllowed, "");
 			}
 
 			functionName = cleanUnderscores(functionName);
@@ -449,10 +449,10 @@ function nestedFolderFunctionName(subcategory: string, functionName: string, fun
 	}
 
 	if (postInit) {
-		return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; postInit = 1; };"
+		return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; postInit = 1; };";
 	}
 
-	return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; };"
+	return "class " + subcategory + "_" + functionName + " { file = \"" + functionPath + "\"; };";
 }
 
 function coreFunctionName(functionName: string, functionDirPath: string, preInit: boolean, postInit: boolean) {
@@ -469,8 +469,8 @@ function coreFunctionName(functionName: string, functionDirPath: string, preInit
 
 function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctionsPath: string, developerTag: string) {
 
-	if (cfgFunctionsPath === undefined) {
-		return;
+	if (cfgFunctionsPath === undefined || cfgFunctionsPath === '') {
+		vscode.window.showErrorMessage("Generic error! CfgFunctions.hpp path is not set for some reason.");
 	}
 
 	const cfgFunctionsFile = readFileSync(cfgFunctionsPath, 'utf-8');
@@ -554,7 +554,7 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 			"\t\t" + "// Only whitelisted functions are allowed." + "\n";
 
 			// AllowRemoteExec parameter
-			if (options[3] == true) {
+			if (options[3] === true) {
 				content += "\t\t" + "mode = 2;";
 			} else {
 				content += "\t\t" + "mode = 1;";
@@ -626,14 +626,14 @@ function generateCfgRemoteExec(context: vscode.ExtensionContext) {
 		content += fncRemoteExecClassString;
 	}
 
-	content += "\t};"
+	content += "\t};";
 
 	content += "\n\n" + 
 		"class Commands" + "\n" + "\t{" + "\n" +
 		"\t\t" + "// Only whitelisted commands are allowed. Other values: 0 = remote execution blocked, 2 = remote execution fully allowed (no whitelist)" + "\n";
 		
 		// AllowRemoteExec parameter
-		if (options[3] == true) {
+		if (options[3] === true) {
 			content += "\t\t" + "mode = 2;";
 		} else {
 			content += "\t\t" + "mode = 1;";
@@ -679,7 +679,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 	let remoteExecServer = false;
 	let remoteExecClient = false;
 	let remoteExecAll = false;
-	let JIPallowed = false;
+	let jipAllowed = false;
 
 	functionName = developerTag + "_fnc_" + (lineStr.substring(lineStr.indexOf("class ") + 6, (lineStr.indexOf(" { file = "))));
 	
@@ -694,8 +694,8 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			remoteExecAll = true;
 	
 			if (!lineStr.includes('_ALL_')) {
-				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (ALL). Please use UPPERCASE formatting.")
-				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (ALL). Please use UPPERCASE formatting.");
+				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.");
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = ALL;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = ALL;" + "\n";
@@ -706,8 +706,8 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			remoteExecServer = true;
 	
 			if (!lineStr.includes('_SERVER_')) {
-				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (SERVER). Please use UPPERCASE formatting.")
-				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (SERVER). Please use UPPERCASE formatting.");
+				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.");
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = SERVER;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = SERVER;" + "\n";
@@ -718,8 +718,8 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 			remoteExecClient = true;
 		
 			if (!lineStr.includes('_CLIENT_')) {
-				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (CLIENT). Please use UPPERCASE formatting.")
-				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution target attribute (CLIENT). Please use UPPERCASE formatting.");
+				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.");
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = CLIENT;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "allowedTargets = CLIENT;" + "\n";
@@ -731,11 +731,11 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 
 		if (lineStr.toLowerCase().includes('_jip_')) {
 
-			JIPallowed = true;
+			jipAllowed = true;
 	
 			if (!lineStr.includes('_JIP_')) {
-				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution JIP (Join In Progress) attribute. Please use UPPERCASE formatting.")
-				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.")
+				outputChannelRemoteExec.appendLine("Function file \"" + rawFunctionName + "\" has misnamed remote execution JIP (Join In Progress) attribute. Please use UPPERCASE formatting.");
+				vscode.window.showWarningMessage("There were warnings during creation of CfgRemoteExec. Check the output channel for more information.");
 				cfgRemoteExecFunctionParams += "\t\t\t" + "jip = 1;" + "\n";
 			} else {
 				cfgRemoteExecFunctionParams += "\t\t\t" + "jip = 1;" + "\n";
@@ -747,7 +747,7 @@ function formatRemoteExecFunction(developerTag: string, lineStr: string, outputC
 	cfgRemoteExecFunctionParams += "\t\t}; \n\n";
 
 	// Check whether we need to include the function in CfgRemoteExec.hpp or not
-	if (!(remoteExecAll || remoteExecClient || remoteExecServer || JIPallowed)) {
+	if (!(remoteExecAll || remoteExecClient || remoteExecServer || jipAllowed)) {
 		cfgRemoteExecFunctionParams = "";
 	}
 
