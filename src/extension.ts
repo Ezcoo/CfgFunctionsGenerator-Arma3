@@ -24,7 +24,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const cfgFunctionsPathInProject = context.workspaceState.get<string>('cfgFunctionsPathInProject') ?? '';
 
-	var disposableCfgFunctionsCompletion = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+	var disposableCfgFunctionsCompletion: vscode.Disposable | undefined;
+
+	try {
+		disposableCfgFunctionsCompletion = loadCfgFunctionsCompletion(context, cfgFunctionsPathInProject, developerTag);
+	} catch (error) {
+		// Don't let completion provider failure prevent command registration
+	}
 
 
 	let disposableCfgFunctionsGenerator = vscode.commands.registerCommand('cfgfunctions.generateCfgFunctions', async () => {
@@ -469,8 +475,8 @@ function coreFunctionName(functionName: string, functionDirPath: string, preInit
 
 function loadCfgFunctionsCompletion(context: vscode.ExtensionContext, cfgFunctionsPath: string, developerTag: string) {
 
-	if (cfgFunctionsPath === undefined || cfgFunctionsPath === '') {
-		vscode.window.showErrorMessage("Generic error! CfgFunctions.hpp path is not set for some reason.");
+	if (cfgFunctionsPath === undefined || cfgFunctionsPath === '' || !fs.existsSync(cfgFunctionsPath)) {
+		return undefined;
 	}
 
 	const cfgFunctionsFile = readFileSync(cfgFunctionsPath, 'utf-8');
