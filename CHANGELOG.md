@@ -71,3 +71,7 @@
 
 - Add an extension setting: toggle allowing unrestrained remote execution (for development purposes).
 - Fix function duplication in autocompletion of functions.
+
+### [1.5.1]
+
+- Fix generic "command cfgfunctions.generateCfgFunctions not found" error that was present in some scenarios
